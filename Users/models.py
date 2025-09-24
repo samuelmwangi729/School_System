@@ -1,0 +1,68 @@
+from django.db import models
+from django.contrib.auth.models import  AbstractUser
+from django.utils import timezone
+from django.contrib.auth.models import UserManager
+from django.utils.translation import gettext_lazy as _
+from Institutions.models import Institution
+# Create your models here.
+class Roles:
+    STUDENT = "student"
+    TEACHER = "teacher"
+    PRINCIPAL = "principal"
+    DEPPRINCIPAL = "deputy_principal"
+    ADMIN = "admin"
+    SUPER_ADMIN = "super_admin"
+
+    choices = (
+        (STUDENT, 'student'),
+        (TEACHER, 'teacher'),
+        (PRINCIPAL, 'principal'),
+        (DEPPRINCIPAL, 'deputy_principal'),
+        (ADMIN, 'admin'),
+        (SUPER_ADMIN, 'super_admin'),
+    )
+#custom user manager 
+class CustomUserManager(UserManager):
+    '''
+    This custom class defines how the users
+    and the super users are created
+    They also help enforce the emails are required
+    '''
+    def create_user(self,username, email, password, **extra_fields):
+        extra_fields.setdefault("is_staff", False)
+        extra_fields.setdefault("is_superuser", False)
+        return self._create_user(username, email, password, **extra_fields)
+    #create the super user 
+    def create_superuser(self,username, email, password, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("role",Roles.SUPER_ADMIN)
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
+
+        return self._create_user(username, email, password, **extra_fields)
+    pass
+#extend the default user
+class User(AbstractUser):
+    first_name = models.CharField(_("first name"), max_length=150, blank=False)
+    last_name = models.CharField(_("last name"), max_length=150, blank=False)
+    email = models.EmailField(_("email address"), blank=False,unique=True)
+    institution = models.ForeignKey(Institution,on_delete=models.CASCADE,related_name="users",blank=True,null=True)
+    role = models.CharField(max_length=50,choices=Roles.choices,default=Roles.TEACHER)
+    objects = CustomUserManager()
+
+    EMAIL_FIELD = "email"
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["username","first_name","last_name","password"]
+
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
+    #allow the app get the token 
+    @property
+    def token(self):
+        pass
