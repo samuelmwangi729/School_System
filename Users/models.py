@@ -21,6 +21,21 @@ class Roles:
         (ADMIN, 'admin'),
         (SUPER_ADMIN, 'super_admin'),
     )
+class Status:
+    ACTIVE = "active"
+    DELETED = "deleted"
+    SUSPENDED = "suspended"
+    EXPIRED = "expired"
+    USED = "used"
+    
+
+    choices = (
+        (ACTIVE, 'active'),
+        (DELETED, 'deleted'),
+        (SUSPENDED, 'suspended'),
+        (EXPIRED, 'expired'),
+        (USED, 'used'),
+    )
 #custom user manager 
 class CustomUserManager(UserManager):
     '''
@@ -53,7 +68,7 @@ class User(AbstractUser):
     institution = models.ForeignKey(Institution,on_delete=models.CASCADE,related_name="users",blank=True,null=True)
     role = models.CharField(max_length=50,choices=Roles.choices,default=Roles.TEACHER)
     objects = CustomUserManager()
-
+    account_status = models.CharField(max_length=20,choices=Status.choices,default=Status.ACTIVE)
     EMAIL_FIELD = "email"
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username","first_name","last_name","password"]
@@ -66,3 +81,32 @@ class User(AbstractUser):
     @property
     def token(self):
         pass
+
+#track logins any time 
+class LoginTracker(models.Model):
+    username  = models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name="logins")
+    hostname = models.CharField(max_length=1000)
+    ip_address = models.CharField(max_length=100)
+    login_time = models.DateField(auto_now=False,auto_now_add=True)
+
+    def __str__(self):
+        return self.username
+#track logouts
+
+class LogoutTracker(models.Model):
+    username = models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name="logouts")
+    logout_time = models.DateField(auto_now=False,auto_now_add=True)
+
+    def __str__(self):
+        return self.username
+
+#password resets
+
+class ResetTokens(models.Model):
+    username = models.ForeignKey(User,models.DO_NOTHING,related_name="user")
+    token = models.CharField(max_length=1000)
+    reset_time = models.DateField(auto_now_add=True)
+    token_status = models.CharField(max_length=20,choices=Status.choices,default=Status.ACTIVE)
+
+    def __str__(self):
+        return self.username
