@@ -1,0 +1,7 @@
+[run]
+source=Institutions/,School/,Users/
+omit=
+    venv
+    */migrations/*
+    */tests/*
+    */__init.py__.py
