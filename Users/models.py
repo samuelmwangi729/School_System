@@ -69,6 +69,8 @@ class User(AbstractUser):
     role = models.CharField(max_length=50,choices=Roles.choices,default=Roles.TEACHER)
     objects = CustomUserManager()
     account_status = models.CharField(max_length=20,choices=Status.choices,default=Status.ACTIVE)
+
+
     EMAIL_FIELD = "email"
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username","first_name","last_name","password"]
