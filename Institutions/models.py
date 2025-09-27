@@ -50,7 +50,7 @@ class InstitutionSNE:
     )
     
 class Institution(models.Model):
-    name = models.CharField(max_length=100,blank=False)
+    name = models.CharField(max_length=100,blank=False,unique=True)
     subcounty = models.CharField(max_length=100,blank=False)
     county = models.CharField(max_length=100,blank=False)
     category = models.CharField(max_length=20,choices=InstitutionCategory.choices,blank=False)
