@@ -1,26 +1,23 @@
-from django.forms import fields
 from rest_framework import serializers
-from Exams.models import Exam
+from Subjects.models import Subject
 from Institutions.models import Institution
 from Users.models import User
-class ExaminationSerializers(serializers.ModelSerializer):
-    institution_name = serializers.CharField(write_only=True)  # input only
-    username = serializers.CharField(write_only=True) #input username from the frontend 
+
+class SubjectSerializer(serializers.ModelSerializer):
+    institution_name = serializers.CharField(write_only=True)
+    username = serializers.CharField(write_only=True)
     institution = serializers.StringRelatedField(read_only=True)
     created_by = serializers.StringRelatedField(read_only=True)
-
-    
-    #load the user and the institution
+    #define the meta details here 
     class Meta:
-        model = Exam
-        fields=['username','institution_name','exam_name','exam_term','created_by','exam_status','exam_year','institution']
-
-    def validate(self, attrs):
+        model = Subject
+        fields=['institution_name','subject_code','subject_name','created_by','username','institution','status']
+    def validate(self,attrs):
+        #get the username and the institution names here
         institution_name = attrs.get('institution_name')
         username = attrs.get('username')
-        exam_name = attrs.get('exam_name')
-
-        # Validate Institution
+        subject_code = attrs.get('subject_code')
+        subject_name = attrs.get('subject_name')
         try:
             institution = Institution.objects.get(name=institution_name)
         except Institution.DoesNotExist:
@@ -37,12 +34,14 @@ class ExaminationSerializers(serializers.ModelSerializer):
             })
 
         # Check for duplicate Exam name for the same institution
-        if Exam.objects.filter(exam_name=exam_name, institution=institution).exists():
+        if Subject.objects.filter(subject_code=subject_code,subject_name=subject_name,institution=institution).exists():
             raise serializers.ValidationError({
-                "exam_name": "An exam with this name already exists for the specified institution."
+                "subject_name": "A subject with this code already exists for the specified institution."
             })
-
-        # Attach validated related objects
+        if Subject.objects.filter(subject_name=subject_name,institution=institution).exists():
+            raise serializers.ValidationError({
+                "subject_name": "A subject with this name already exists for the specified institution."
+            })
         attrs['created_by'] = user
         attrs['institution'] = institution
 
@@ -50,7 +49,8 @@ class ExaminationSerializers(serializers.ModelSerializer):
 
 
     def create(self,validated_data):
+        #create the items here
         validated_data.pop('institution_name')
         validated_data.pop('username')
-        exam = Exam.objects.create(**validated_data)
-        return exam
+        subject = Subject.objects.create(**validated_data)
+        return subject
