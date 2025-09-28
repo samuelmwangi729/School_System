@@ -2,8 +2,12 @@ from .serializers import institutionSerializer
 from rest_framework.views import APIView
 from rest_framework import response,status
 from Institutions.models import Institution
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 class InstitutionView(APIView):
     serializer_class = institutionSerializer
+    # permission_classes=[IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
 
     def post(self,request):
         data = request.data

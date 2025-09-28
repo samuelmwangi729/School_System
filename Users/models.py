@@ -4,6 +4,9 @@ from django.utils import timezone
 from django.contrib.auth.models import UserManager
 from django.utils.translation import gettext_lazy as _
 from Institutions.models import Institution
+import jwt
+from datetime import datetime,timedelta
+from django.conf import settings
 # Create your models here.
 class Roles:
     STUDENT = "student"
@@ -82,7 +85,14 @@ class User(AbstractUser):
     #allow the app get the token 
     @property
     def token(self):
-        pass
+        token = jwt.encode({
+            "username":self.username,
+            "email":self.email,
+            "exp":datetime.utcnow()+timedelta(hours=2)
+            },
+            settings.SECRET_KEY,algorithm='HS256'
+            )
+        return token
 
 #track logins any time 
 class LoginTracker(models.Model):
