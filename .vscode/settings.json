@@ -1,0 +1,19 @@
+{
+  // Use Alt (or Option on macOS) to add multiple cursors with mouse
+  "editor.multiCursorModifier": "alt",
+
+  // Show cursor indicators when using multiple cursors
+  "editor.cursorBlinking": "blink",
+
+  // Optional: Highlight all occurrences of selection
+  "editor.occurrencesHighlight": true,
+
+  // Optional: Display selection count in status bar
+  "editor.selectionHighlight": true,
+
+  // Optional: Better performance with multi-cursor editing
+  "editor.fastScrollSensitivity": 5,
+
+  // Optional: Enable smooth scrolling while using multi-cursors
+  "editor.smoothScrolling": true
+}
