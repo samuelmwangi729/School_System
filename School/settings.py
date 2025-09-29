@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'Users.apps.UsersConfig',
     "Institutions.apps.InstitutionsConfig",
     'Exams.apps.ExamsConfig',
-    'Subjects.apps.SubjectsConfig'
+    'Subjects.apps.SubjectsConfig',
+    'InstitutionClasses.apps.InstitutionclassesConfig'
 ]
 AUTH_USER_MODEL="Users.User"
 REST_FRAMEWORK = {

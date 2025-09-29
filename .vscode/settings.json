@@ -6,7 +6,7 @@
   "editor.cursorBlinking": "blink",
 
   // Optional: Highlight all occurrences of selection
-  "editor.occurrencesHighlight": true,
+  "editor.occurrencesHighlight": "singleFile",
 
   // Optional: Display selection count in status bar
   "editor.selectionHighlight": true,
