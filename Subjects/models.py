@@ -23,4 +23,4 @@ class Subject(models.Model):
     status = models.CharField(max_length=10,choices=SubjectStatus.choices,default=SubjectStatus.ACTIVE)
 
     def __str__(self):
-        return self.institution
+        return self.subject_name
