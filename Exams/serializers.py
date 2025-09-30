@@ -3,17 +3,19 @@ from rest_framework import serializers
 from Exams.models import Exam
 from Institutions.models import Institution
 from Users.models import User
+
 class ExaminationSerializers(serializers.ModelSerializer):
-    institution_name = serializers.CharField(write_only=True)  # input only
-    username = serializers.CharField(write_only=True) #input username from the frontend 
+    institution_name = serializers.CharField(write_only=True)
+    username = serializers.CharField(write_only=True)
     institution = serializers.StringRelatedField(read_only=True)
     created_by = serializers.StringRelatedField(read_only=True)
 
-    
-    #load the user and the institution
     class Meta:
         model = Exam
-        fields=['username','institution_name','exam_name','exam_term','created_by','exam_status','exam_year','institution']
+        fields = [
+            'username', 'institution_name', 'exam_name', 'exam_term',
+            'created_by', 'exam_status', 'exam_year', 'institution'
+        ]
 
     def validate(self, attrs):
         institution_name = attrs.get('institution_name')
@@ -36,21 +38,30 @@ class ExaminationSerializers(serializers.ModelSerializer):
                 "username": "User with this username does not exist."
             })
 
-        # Check for duplicate Exam name for the same institution
-        if Exam.objects.filter(exam_name=exam_name, institution=institution).exists():
+        # Prevent duplicate exams (excluding self on update)
+        existing_exam = Exam.objects.filter(exam_name=exam_name, institution=institution)
+        if self.instance:
+            existing_exam = existing_exam.exclude(pk=self.instance.pk)
+        if existing_exam.exists():
             raise serializers.ValidationError({
                 "exam_name": "An exam with this name already exists for the specified institution."
             })
 
-        # Attach validated related objects
+        # Attach for use in create/update
         attrs['created_by'] = user
         attrs['institution'] = institution
 
         return attrs
 
-
-    def create(self,validated_data):
+    def create(self, validated_data):
         validated_data.pop('institution_name')
         validated_data.pop('username')
-        exam = Exam.objects.create(**validated_data)
-        return exam
+        return Exam.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        validated_data.pop('institution_name', None)
+        validated_data.pop('username', None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance

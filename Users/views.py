@@ -4,7 +4,7 @@ from rest_framework.generics import GenericAPIView
 from django.contrib.auth import authenticate,login
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-
+from Users.models import User
 from Users.serializers import LoginSerializer, UpdateUserSerializer, UserSerializer
 class UserView(GenericAPIView):
     serializer_class = UserSerializer

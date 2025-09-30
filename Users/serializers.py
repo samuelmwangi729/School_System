@@ -71,9 +71,10 @@ class UpdateUserSerializer(serializers.ModelSerializer):
     username = serializers.CharField()
     first_name = serializers.CharField(read_only=True)
     last_name = serializers.CharField(read_only=True)
+    user_class = serializers.StringRelatedField()
     class Meta:
         model=User
-        fields=['class_code','institution_name','username','first_name','last_name']
+        fields=['class_code','institution_name','username','first_name','last_name','role','user_class']
     def validate(self,attrs):
         username = attrs.get('username')
         institution_name = attrs.get('institution_name')
@@ -96,14 +97,6 @@ class UpdateUserSerializer(serializers.ModelSerializer):
                 "user":"user does not exist"
                 })
         try:
-            teacher = User.objects.get(username=username,institution=institution)
-            print(user)
-        except User.DoesNotExist:
-            raise serializers.ValidationError({
-                "user":"user does not exist"
-                })
-        
-        try:
             form = Classes.objects.get(institution=institution,class_code=class_code)
         except Classes.DoesNotExist:
             raise serializers.ValidationError({
@@ -113,7 +106,6 @@ class UpdateUserSerializer(serializers.ModelSerializer):
         attrs['user_class'] = form
         return attrs
         #then the create method, you get the user and update the classes here
-
     def create(self,validated_data):
         validated_data.pop('class_code')
         validated_data.pop('institution_name')

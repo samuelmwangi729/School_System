@@ -1,17 +1,26 @@
 from rest_framework import serializers
 from Institutions.models import Institution
 
-class institutionSerializer(serializers.ModelSerializer):
+class InstitutionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Institution
-        fields=["name","subcounty","county","category","institutionType","studentGender","status"]
+        fields = ["name", "subcounty", "county", "category", "institutionType", "studentGender", "status"]
 
-    #create institution here 
-    def validate_name(self, value):
-        if Institution.objects.filter(name=value).exists():
+    def validate(self, value):
+        # If we're updating and the name hasn't changed, allow it
+        if self.instance and self.instance.name == value:
+            return value
+
+        # Otherwise, ensure the name is unique across other records
+        if Institution.objects.filter(name=value).exclude(pk=getattr(self.instance, 'pk', None)).exists():
             raise serializers.ValidationError("Institution with this name already exists.")
         return value
-    
-    def create(self,validated_data):
-        institution = Institution.objects.create(**validated_data)
-        return institution
+
+    def create(self, validated_data):
+        return Institution.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
