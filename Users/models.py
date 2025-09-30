@@ -7,6 +7,7 @@ from Institutions.models import Institution
 import jwt
 from datetime import datetime,timedelta
 from django.conf import settings
+from InstitutionClasses.models import InstitutionClass as Classes
 # Create your models here.
 class Roles:
     STUDENT = "student"
@@ -71,6 +72,7 @@ class User(AbstractUser):
     institution = models.ForeignKey(Institution,on_delete=models.CASCADE,related_name="users",blank=True,null=True)
     role = models.CharField(max_length=50,choices=Roles.choices,default=Roles.TEACHER)
     objects = CustomUserManager()
+    user_class = models.ForeignKey(Classes,on_delete=models.CASCADE,null=True,blank=True,related_name="user_class")
     account_status = models.CharField(max_length=20,choices=Status.choices,default=Status.ACTIVE)
 
 

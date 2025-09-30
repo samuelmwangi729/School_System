@@ -2,10 +2,11 @@ from rest_framework import serializers
 from Users.models import User
 from Institutions.models import Institution
 from django.contrib.auth import authenticate
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, StringRelatedField
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from Institutions.models import Institution
+from InstitutionClasses.models import InstitutionClass as Classes
 
 User = get_user_model()
 
@@ -64,3 +65,59 @@ class LoginSerializer(serializers.ModelSerializer):
         read_only_fields=['token']
     def get_token(self, obj):
         return obj.token
+class UpdateUserSerializer(serializers.ModelSerializer):
+    institution_name = serializers.CharField(write_only=True)
+    class_code = serializers.CharField(write_only=True)
+    username = serializers.CharField()
+    first_name = serializers.CharField(read_only=True)
+    last_name = serializers.CharField(read_only=True)
+    class Meta:
+        model=User
+        fields=['class_code','institution_name','username','first_name','last_name']
+    def validate(self,attrs):
+        username = attrs.get('username')
+        institution_name = attrs.get('institution_name')
+        class_code = attrs.get('class_code')
+        try:
+            #check if the user exists in an institution]
+            #start by validating the institution
+            institution = Institution.objects.get(name=institution_name)
+        except Institution.DoesNotExist:
+            raise serializers.ValidationError({
+                "institution":"institution does not exist"
+                })
+        #get the username here
+        try:
+            user = User.objects.get(username=username)
+            if user.role != 'student':
+                raise serializers.ValidationError({"user":"user must be a student"})
+        except User.DoesNotExist:
+            raise serializers.ValidationError({
+                "user":"user does not exist"
+                })
+        try:
+            teacher = User.objects.get(username=username,institution=institution)
+            print(user)
+        except User.DoesNotExist:
+            raise serializers.ValidationError({
+                "user":"user does not exist"
+                })
+        
+        try:
+            form = Classes.objects.get(institution=institution,class_code=class_code)
+        except Classes.DoesNotExist:
+            raise serializers.ValidationError({
+                "class":"the class does not exist"
+                })
+        attrs['user'] = user
+        attrs['user_class'] = form
+        return attrs
+        #then the create method, you get the user and update the classes here
+
+    def create(self,validated_data):
+        validated_data.pop('class_code')
+        validated_data.pop('institution_name')
+        user = User.objects.get(username=validated_data['username'])
+        user.user_class = validated_data['user_class']
+        user.save()
+        return user

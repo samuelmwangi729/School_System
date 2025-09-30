@@ -2,8 +2,10 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
 from django.contrib.auth import authenticate,login
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
-from Users.serializers import UserSerializer,LoginSerializer
+from Users.serializers import LoginSerializer, UpdateUserSerializer, UserSerializer
 class UserView(GenericAPIView):
     serializer_class = UserSerializer
 
@@ -33,3 +35,22 @@ class LoginView(GenericAPIView):
             "status":"error",
             "message":"invalid credentials used"
             },status = status.HTTP_401_UNAUTHORIZED)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UserView(GenericAPIView):
+    serializer_class = UpdateUserSerializer
+    def get(self,request):
+        pass
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+            "status":"success",
+            "message":"user successfully updated",
+            "data":serializer.data
+            })
+        return Response({
+            "status":"error",
+            "message":serializer.errors
+            })
