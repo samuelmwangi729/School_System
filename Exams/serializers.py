@@ -1,11 +1,12 @@
 from django.forms import fields
 from rest_framework import serializers
-from Exams.models import Exam
+from Exams.models import Exam, ExaminationStatus
 from Institutions.models import Institution
 from Users.models import User
 
 class ExaminationSerializers(serializers.ModelSerializer):
     institution_name = serializers.CharField(write_only=True)
+    exam_status = serializers.CharField()
     username = serializers.CharField(write_only=True)
     institution = serializers.StringRelatedField(read_only=True)
     created_by = serializers.StringRelatedField(read_only=True)
@@ -61,6 +62,12 @@ class ExaminationSerializers(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         validated_data.pop('institution_name', None)
         validated_data.pop('username', None)
+        exam_status=validated_data.get('exam_status')
+        valid_choices = [choice[0] for choice in ExaminationStatus.choices]
+        if exam_status and exam_status not in valid_choices:
+            raise serializers.ValidationError({
+                "exam_status": "invalid status sent"
+            })
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()

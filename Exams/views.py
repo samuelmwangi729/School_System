@@ -1,8 +1,8 @@
 from rest_framework.generics import GenericAPIView
-from django.template.context_processors import request
 from Exams.serializers import ExaminationSerializers
 from Exams.models import Exam
 from rest_framework import response,status
+from rest_framework.response import Response
 from Institutions.models  import Institution
 class ExaminationView(GenericAPIView):
     #get the examinations here 
@@ -35,29 +35,38 @@ class ExaminationView(GenericAPIView):
             "message":serializer.errors
             },status=status.HTTP_400_BAD_REQUEST)
     def put(self,request,exam_name=None):
-        #load the examination here
         institution_name = request.data.get("institution_name")
-        institution = Institution.objects.get(name=institution_name)
+        if not institution_name:
+            return Response({
+                "status": "error",
+                "message": "institution_name is required"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            exam = Exam.objects.get(institution=institution,exam_name=exam_name)
+            institution = Institution.objects.get(name=institution_name)
+        except Institution.DoesNotExist:
+            return Response({
+                "status": "error",
+                "message": "Institution does not exist"
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            exam = Exam.objects.get(institution=institution, exam_name=exam_name)
         except Exam.DoesNotExist:
-            return response.Response({
-                "status":"error",
-                "message":"the exam does not exist"
-                })
-        serializer = self.serializer_class(exam,data=request.data,partial=True)
+            return Response({
+                "status": "error",
+                "message": "Exam does not exist"
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.serializer_class(instance=exam, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return response.Response({
-                "status":"success",
-                "message":serializer.data
-                })
-        return response.Response({
-                "status":"error",
-                "message":serializer.errors
-                })
-    def update(self, instance, validated_data):
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        return instance
+            return Response({
+                "status": "success",
+                "message": serializer.data
+            }, status=status.HTTP_200_OK)
+
+        return Response({
+            "status": "error",
+            "message": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
