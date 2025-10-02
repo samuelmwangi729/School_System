@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'Exams.apps.ExamsConfig',
     'Subjects.apps.SubjectsConfig',
     'InstitutionClasses.apps.InstitutionclassesConfig',
-    'Teachers.apps.TeachersConfig'
+    'Teachers.apps.TeachersConfig',
+    'Results.apps.ResultsConfig'
 ]
 AUTH_USER_MODEL="Users.User"
 REST_FRAMEWORK = {

@@ -23,5 +23,6 @@ urlpatterns = [
     path("api/",include("Exams.urls")),
     path("api/",include("Subjects.urls")),
     path("api/",include("InstitutionClasses.urls")),
-    path("api/",include("Teachers.urls"))
+    path("api/",include("Teachers.urls")),
+    path("api/",include("Results.urls")),
 ]
