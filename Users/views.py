@@ -5,7 +5,8 @@ from django.contrib.auth import authenticate,login
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from Users.models import User
-from Users.serializers import LoginSerializer, UpdateUserSerializer, UserSerializer
+from Users.serializers import LoginSerializer, UpdateUserSerializer, UserSerializer,JwtTokenSerializerPair
+from rest_framework_simplejwt.views import TokenObtainPairView,TokenVerifyView
 class UserView(GenericAPIView):
     serializer_class = UserSerializer
 
@@ -54,3 +55,18 @@ class UserView(GenericAPIView):
             "status":"error",
             "message":serializer.errors
             })
+class JwtTokenObtainView(TokenObtainPairView):
+    serializer_class = JwtTokenSerializerPair
+    # override the post method here 
+    def post(self,request,*args,**kwargs):
+        response = super().post(request,*args,**kwargs)
+        tokens = response.data
+        return Response({"tokens":tokens},status=status.HTTP_200_OK)
+
+class CustomJwtTokenValidator(TokenVerifyView):
+    serializer_class = JwtTokenSerializerPair
+    def post(self,request,*args,**kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            return Response({"tokens":serializer.data},status=status.HTTP_200_OK)
+        return Response({"tokens":"invalid token"},status=status.HTTP_400_BAD_REQUEST)

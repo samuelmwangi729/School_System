@@ -7,7 +7,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from Institutions.models import Institution
 from InstitutionClasses.models import InstitutionClass as Classes
-
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
@@ -65,6 +65,20 @@ class LoginSerializer(serializers.ModelSerializer):
         read_only_fields=['token']
     def get_token(self, obj):
         return obj.token
+
+class JwtTokenSerializerPair(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        #added custom fields to the jwt  token here
+        token['first_name'] = user.first_name
+        token['last_name'] = user.last_name
+        token['username'] = user.username
+        token['institution'] = user.institution.name
+        token['role'] = user.role
+        token['user_class'] = user.user_class.class_name
+
+        return token
 class UpdateUserSerializer(serializers.ModelSerializer):
     institution_name = serializers.CharField(write_only=True)
     class_code = serializers.CharField(write_only=True)
