@@ -15,30 +15,34 @@ class InstitutionCategory:
     NATIONAL="national"
     EXTRACOUNTY="extra_county"
     COUNTY="county"
+    NoInstitution="None"
 
     choices=(
         (NATIONAL,"national"),
         (EXTRACOUNTY,"extra_county"),
-        (COUNTY,"county")
+        (COUNTY,"county"),
+        (NoInstitution,"None"),
     )
 
 class InstitutionType:
     DAY="day"
     BOARDING="boarding"
-
+    NoInstitution="None"
     choices=(
         (DAY,"day"),
-        (BOARDING,"boarding")
+        (BOARDING,"boarding"),
+        (NoInstitution,"None"),
     )
 class InstitutionStudentType:
     BOYS="boys"
     GIRLS="girls"
     MIXED="mixed"
-
+    NoInstitution="None"
     choices=(
         (BOYS,"boys"),
         (GIRLS,"girls"),
-        (MIXED,"mixed")
+        (MIXED,"mixed"),
+        (NoInstitution,"None"),
     )
 class InstitutionSNE:
     YES=True

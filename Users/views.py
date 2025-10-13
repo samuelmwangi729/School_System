@@ -1,10 +1,9 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
-from django.contrib.auth import authenticate,login
+from django.contrib.auth import authenticate
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from Users.models import User
 from Users.serializers import LoginSerializer, UpdateUserSerializer, UserSerializer,JwtTokenSerializerPair
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenVerifyView
 class UserView(GenericAPIView):
@@ -48,7 +47,7 @@ class UserView(GenericAPIView):
             serializer.save()
             return Response({
             "status":"success",
-            "message":"user successfully updated",
+            "message":"user successfully Updated",
             "data":serializer.data
             })
         return Response({
@@ -58,10 +57,21 @@ class UserView(GenericAPIView):
 class JwtTokenObtainView(TokenObtainPairView):
     serializer_class = JwtTokenSerializerPair
     # override the post method here 
-    def post(self,request,*args,**kwargs):
-        response = super().post(request,*args,**kwargs)
-        tokens = response.data
-        return Response({"tokens":tokens},status=status.HTTP_200_OK)
+    def post(self, request, *args, **kwargs):
+        try:
+            response = super().post(request, *args, **kwargs)
+            tokens = response.data
+            return Response({
+                "status": "success",
+                "message": "Successfully logged in",
+                "data": tokens
+            }, status=status.HTTP_200_OK)
+
+        except Exception:
+            return Response({
+                "status": "error",
+                "message": "invalid login details"
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 class CustomJwtTokenValidator(TokenVerifyView):
     serializer_class = JwtTokenSerializerPair

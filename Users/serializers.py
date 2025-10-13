@@ -104,8 +104,9 @@ class UpdateUserSerializer(serializers.ModelSerializer):
         #get the username here
         try:
             user = User.objects.get(username=username)
-            if user.role != 'student':
-                raise serializers.ValidationError({"user":"user must be a student"})
+            print(user.role)
+            # if user.role != 'student':
+            #     raise serializers.ValidationError({"user":"user must be a student"})
         except User.DoesNotExist:
             raise serializers.ValidationError({
                 "user":"user does not exist"
