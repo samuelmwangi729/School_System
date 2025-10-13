@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+import os
+from dotenv import load_dotenv
+load_dotenv() 
+
 APP_VERIFY_KEY = "Sup3R53CR#TK#y!@#"
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -133,11 +137,11 @@ WSGI_APPLICATION = 'School.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME':'school',
-        'USER':'postgres',
-        'PASSWORD':'root',
-        'HOST':'localhost',
-        'PORT':'5432',
+        'NAME':os.getenv("PGDATABASE"),
+        'USER':os.getenv("PGUSER"),
+        'PASSWORD':os.getenv("PGPASSWORD"),
+        'HOST':os.getenv("PGHOST"),
+        'PORT':os.getenv("PGPOST"),
     }
 }
 
