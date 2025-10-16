@@ -70,13 +70,14 @@ class JwtTokenSerializerPair(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
+        print(user.user_class)
         #added custom fields to the jwt  token here
         token['first_name'] = user.first_name
         token['last_name'] = user.last_name
         token['username'] = user.username
         token['institution'] = user.institution.name
         token['role'] = user.role
-        token['user_class'] = user.user_class.class_name
+        token['user_class'] = "null" if user.user_class is None else user.user_class.class_name
 
         return token
 class UpdateUserSerializer(serializers.ModelSerializer):

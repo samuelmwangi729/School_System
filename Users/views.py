@@ -4,6 +4,7 @@ from rest_framework.generics import GenericAPIView
 from django.contrib.auth import authenticate
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from Users.serializers import LoginSerializer, UpdateUserSerializer, UserSerializer,JwtTokenSerializerPair
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenVerifyView
 class UserView(GenericAPIView):
@@ -38,7 +39,7 @@ class LoginView(GenericAPIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class UserView(GenericAPIView):
-    serializer_class = UpdateUserSerializer
+    serializer_class = UserSerializer
     def get(self,request):
         pass
     def post(self,request):
@@ -56,7 +57,7 @@ class UserView(GenericAPIView):
             })
 class JwtTokenObtainView(TokenObtainPairView):
     serializer_class = JwtTokenSerializerPair
-    # override the post method here 
+
     def post(self, request, *args, **kwargs):
         try:
             response = super().post(request, *args, **kwargs)
@@ -67,11 +68,19 @@ class JwtTokenObtainView(TokenObtainPairView):
                 "data": tokens
             }, status=status.HTTP_200_OK)
 
-        except Exception:
+        except (AuthenticationFailed, ValidationError) as e:
             return Response({
                 "status": "error",
-                "message": "invalid login details"
+                "message": str(e.detail if hasattr(e, 'detail') else e)
             }, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            # Optional: log this if you want
+            print("Unexpected error:", e)
+            return Response({
+                "status": "error",
+                "message": "An unexpected error occurred."
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class CustomJwtTokenValidator(TokenVerifyView):
     serializer_class = JwtTokenSerializerPair
