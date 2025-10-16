@@ -75,7 +75,7 @@ class JwtTokenSerializerPair(TokenObtainPairSerializer):
         token['first_name'] = user.first_name
         token['last_name'] = user.last_name
         token['username'] = user.username
-        token['institution'] = user.institution.name
+        token['institution'] ="null" if user.institution is None else user.institution.name
         token['role'] = user.role
         token['user_class'] = "null" if user.user_class is None else user.user_class.class_name
 
