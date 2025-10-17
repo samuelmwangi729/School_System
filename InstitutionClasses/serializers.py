@@ -10,12 +10,11 @@ class ClassesSerializer(serializers.ModelSerializer):
     institution_name = serializers.CharField(write_only=True)
     username = serializers.CharField(write_only=True)
     institution = serializers.StringRelatedField(read_only=True)
-    created_by = serializers.StringRelatedField(read_only=True) #these ones are to be read from the returned object
 
     class Meta:
         model = Classes
         fields=['class_code','class_name','institution','institution_name',
-                'institution_status','created_by','username']
+                'class_status','username']
     #declare the validate method 
     '''
     1. check if the institution exists
@@ -53,7 +52,6 @@ class ClassesSerializer(serializers.ModelSerializer):
                 "class_code":"the class with the same code exists!"
                 })
         attrs['institution']  = institution
-        attrs['created_by']  = user
         
         return attrs
     def create(self,validated_data):

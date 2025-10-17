@@ -30,4 +30,4 @@ class InstitutionClassView(GenericAPIView):
         return response.Response({
             "status":"error",
             "message":serializer.errors,
-            },status=status.HTTP_201_CREATED)
+            },status=status.HTTP_400_BAD_REQUEST)

@@ -4,8 +4,11 @@ from Exams.models import Exam
 from rest_framework import response,status
 from rest_framework.response import Response
 from Institutions.models  import Institution
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 class ExaminationView(GenericAPIView):
-    #get the examinations here 
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     serializer_class = ExaminationSerializers
     def get(self,request):
         queryset = Exam.objects.all()
@@ -22,6 +25,7 @@ class ExaminationView(GenericAPIView):
         # title = request.data.get('title',None)
         # term = request.data.get('term',None)
         data = request.data
+        print(data)
         serializer = self.serializer_class(data=data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()

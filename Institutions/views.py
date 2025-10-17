@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework import response,status
 from Institutions.models import Institution
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.authentication import JWTAuthentication  # <-- Use this
+from rest_framework_simplejwt.authentication import JWTAuthentication
 class InstitutionView(APIView):
     serializer_class = InstitutionSerializer
     authentication_classes = [JWTAuthentication]

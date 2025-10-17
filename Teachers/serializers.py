@@ -14,10 +14,11 @@ class TeacherSerializer(serializers.ModelSerializer):
     teacher = serializers.StringRelatedField(read_only=True)
     subject = serializers.StringRelatedField(read_only=True)
     form = serializers.StringRelatedField(read_only=True)
+    institution = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = Teacher
-        fields=['institution_name','teacher_name','subject_name','class_code','teacher','subject','form','status']
+        fields=['institution_name','institution','teacher_name','subject_name','class_code','teacher','subject','form','status']
 
 
     #validate the data sent
@@ -33,7 +34,7 @@ class TeacherSerializer(serializers.ModelSerializer):
             institution = Institution.objects.get(name=institution_name)
         except Institution.DoesNotExist:
             raise serializers.ValidationError({
-                "institution":"institution does not exist"
+                "institution_name":"institution does not exist"
                 })
         try:
             teacher = User.objects.get(username=teacher_name,institution=institution)
@@ -42,27 +43,27 @@ class TeacherSerializer(serializers.ModelSerializer):
             #     raise serializers.ValidationError({"teacher":"the user is not registered as a teacher"})
 
         except User.DoesNotExist:
-             raise serializers.ValidationError({"teacher":"teacher with the username does not exist in the institution"})
+             raise serializers.ValidationError({"teacher_name":"teacher with the username does not exist in the institution"})
         #check the subject exists in the institution
         try:
             subject = Subject.objects.get(institution=institution,subject_name=subject_name)
         except Subject.DoesNotExist:
-            raise serializers.ValidationError({"subject":"subject does not exist"})
+            raise serializers.ValidationError({"subject_name":"subject does not exist"})
         try:
             form = Classes.objects.get(institution=institution,class_code=class_code)
         except Classes.DoesNotExist:
             raise serializers.ValidationError({
-                "class":"the class does not exist"
+                "class_code":"the class does not exist"
                 })
         #check no teacher should be added same class, same subject and same form
         if Teacher.objects.filter(teacher=teacher,subject=subject,form=form).exists():
             raise serializers.ValidationError({
-                "teacher":"teacher already added"
+                "teacher_name":"teacher already added"
                 })
         #limit the teacher to teach only two subjects per form
         if Teacher.objects.filter(teacher=teacher,form=form).count()==2:
             raise serializers.ValidationError({
-                "teacher":f"Mr {teacher.last_name} can only teach a maximum of 2 subjects in {form.class_name}"
+                "teacher_name":f"Mr {teacher.last_name} can only teach a maximum of 2 subjects in {form.class_name}"
                 })
         data['form'] = form
         data['teacher'] = teacher

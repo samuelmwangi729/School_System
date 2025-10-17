@@ -7,18 +7,21 @@ from django.utils.decorators import method_decorator
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from Users.serializers import LoginSerializer, UpdateUserSerializer, UserSerializer,JwtTokenSerializerPair
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenVerifyView
-class UserView(GenericAPIView):
-    serializer_class = UserSerializer
+from rest_framework.permissions import AllowAny,IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from Users.models import User
+# class UserView(GenericAPIView):
+#     serializer_class = UserSerializer
 
-    def post(self,request):
-        data  = request.data
-        serializer = self.serializer_class(data=data)
+#     def post(self,request):
+#         data  = request.data
+#         serializer = self.serializer_class(data=data)
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
-        errors = serializer.errors
-        return Response({"errors":errors},status=status.HTTP_400_BAD_REQUEST)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
+#         errors = serializer.errors
+#         return Response({"errors":errors},status=status.HTTP_400_BAD_REQUEST)
 class LoginView(GenericAPIView):
     serializer_class = LoginSerializer
     def post(self,request):
@@ -39,7 +42,35 @@ class LoginView(GenericAPIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class UserView(GenericAPIView):
+    permission_classes = [AllowAny]
     serializer_class = UserSerializer
+
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+            "status":"success",
+            "message":"user successfully Registered"
+            })
+        return Response({
+            "status":"error",
+            "message":serializer.errors
+            })
+class StudentsView(GenericAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
+    def get(self,request):
+        queryset = User.objects.filter(role="student")
+        serializer = self.serializer_class(queryset,many=True)
+        return Response({
+            "status":"success",
+            "message":"users fetched",
+            "data":serializer.data
+            },status=status.HTTP_200_OK)
+class UserUpdateView(GenericAPIView):
+    serializer_class = UpdateUserSerializer
     def get(self,request):
         pass
     def post(self,request):
@@ -48,7 +79,7 @@ class UserView(GenericAPIView):
             serializer.save()
             return Response({
             "status":"success",
-            "message":"user successfully Registered",
+            "message":"user successfully Updated",
             "data":serializer.data
             })
         return Response({
@@ -56,6 +87,7 @@ class UserView(GenericAPIView):
             "message":serializer.errors
             })
 class JwtTokenObtainView(TokenObtainPairView):
+    permission_classes = [AllowAny]
     serializer_class = JwtTokenSerializerPair
 
     def post(self, request, *args, **kwargs):
