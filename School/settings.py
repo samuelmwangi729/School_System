@@ -113,7 +113,9 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'School.urls'
-
+CSRF_TRUSTED_ORIGINS = [
+    "https://scholarvio.up.railway.app",
+]
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
