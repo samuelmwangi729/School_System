@@ -28,9 +28,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'euq_!ybb*ug3x_07mr7v6s8tce=w1$6b^3pbf0iyv&(+rv4g$j'
 APP_NAME="SCHOLARVIO"
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["https://scholarvio.up.railway.app","localhost"]
 
 
 # Application definition
@@ -181,15 +181,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # For collectstatic
 
+# Optional (for additional static files in dev)
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #to be uncommented when the appis in production
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",  # React/Vue dev server
-#     "http://127.0.0.1:3000",  # another common localhost setup
-#     # Add your frontend domain here
-# ]
-CORS_ALLOW_ALL_ORIGINS=True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # React/Vue dev server
+    "http://127.0.0.1:3000",  # another common localhost setup
+    "https://scholarvio.vercel.app"
+]
+#CORS_ALLOW_ALL_ORIGINS=True
