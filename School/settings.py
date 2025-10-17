@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'euq_!ybb*ug3x_07mr7v6s8tce=w1$6b^3pbf0iyv&(+rv4g$j'
 APP_NAME="SCHOLARVIO"
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["https://scholarvio.up.railway.app","localhost"]
 
