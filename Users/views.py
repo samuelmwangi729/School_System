@@ -48,7 +48,7 @@ class UserView(GenericAPIView):
             serializer.save()
             return Response({
             "status":"success",
-            "message":"user successfully Updated",
+            "message":"user successfully Registered",
             "data":serializer.data
             })
         return Response({

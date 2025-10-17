@@ -30,7 +30,7 @@ APP_NAME="SCHOLARVIO"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["scholarvio.up.railway.app","localhost"]
+ALLOWED_HOSTS = ["scholarvio.up.railway.app","localhost","*"]
 
 
 # Application definition
@@ -58,7 +58,10 @@ AUTH_USER_MODEL="Users.User"
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ]
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
 }
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
@@ -195,8 +198,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #to be uncommented when the appis in production
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React/Vue dev server
-    "http://127.0.0.1:3000",  # another common localhost setup
+    "http://localhost:5173",  # React/Vue dev server
     "https://scholarvio.vercel.app"
 ]
 #CORS_ALLOW_ALL_ORIGINS=True

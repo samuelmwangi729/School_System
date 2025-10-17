@@ -3,11 +3,11 @@ from rest_framework.views import APIView
 from rest_framework import response,status
 from Institutions.models import Institution
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication  # <-- Use this
 class InstitutionView(APIView):
     serializer_class = InstitutionSerializer
-    # permission_classes=[IsAuthenticated]
-    # authentication_classes = [TokenAuthentication]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self,request):
         data = request.data
@@ -15,7 +15,11 @@ class InstitutionView(APIView):
 
         if(serializer.is_valid()):
             serializer.save()
-            return response.Response(serializer.data,status=status.HTTP_201_CREATED)
+            return response.Response({
+                "status":"success",
+                "message":"institution successfully created",
+                "data":serializer.data
+                },status=status.HTTP_201_CREATED)
         return response.Response({"errors":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
 
     def get(self,request):
@@ -36,7 +40,7 @@ class InstitutionView(APIView):
             serializer.save()
             return response.Response({
                 "status":"success",
-                "message":serializer.data
+                "message":"successfully updated the institution"
                 })
         return response.Response({
                 "status":"error",
