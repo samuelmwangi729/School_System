@@ -6,7 +6,7 @@ from Users.models import User
 
 class ExaminationSerializers(serializers.ModelSerializer):
     institution_name = serializers.CharField(write_only=True)
-    exam_status = serializers.CharField()
+    exam_status = serializers.CharField(default="active")
     username = serializers.CharField(write_only=True)
     institution = serializers.StringRelatedField(read_only=True)
     created_by = serializers.StringRelatedField(read_only=True)

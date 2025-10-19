@@ -17,12 +17,13 @@ class UserSerializer(serializers.ModelSerializer):
     institution = serializers.StringRelatedField(read_only=True)  # output only
     user_class = serializers.StringRelatedField(read_only=True)  # output only
     account_status = serializers.CharField(read_only=True)  # output only
+    adm_no = serializers.IntegerField(write_only=True,default=0)  # input only
 
     class Meta:
         model = User
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name', 'role','user_class',
-            'institution_name', 'institution', 'password','class_code','account_status'
+            'institution_name', 'institution', 'password','class_code','account_status','adm_no'
         ]
         extra_kwargs = {
             'password': {'write_only': True},

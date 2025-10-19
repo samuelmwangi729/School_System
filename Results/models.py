@@ -10,7 +10,7 @@ class Result(models.Model):
     institution = models.ForeignKey(Institution,on_delete=models.CASCADE,related_name="institution_results")
     exam = models.ForeignKey(Exam,on_delete=models.CASCADE,related_name="exam_results")
     term = models.CharField(max_length=5,choices=EXAMTERMS.choices,blank=False)
-    year = models.DateField(default=datetime.now().year)
+    year = models.IntegerField(default=datetime.now().year)
     form = models.ForeignKey(student_class,on_delete=models.CASCADE,related_name="student_class",null=True,blank=True)
     teacher = models.ForeignKey(User,on_delete=models.CASCADE,related_name="teacher_results")
     student = models.ForeignKey(User,on_delete=models.CASCADE,related_name="student_results")

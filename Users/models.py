@@ -69,6 +69,7 @@ class User(AbstractUser):
     first_name = models.CharField(_("first name"), max_length=150, blank=False)
     last_name = models.CharField(_("last name"), max_length=150, blank=False)
     email = models.EmailField(_("email address"), blank=False,unique=True)
+    adm_no = models.IntegerField(_("admission_number"),default=0)
     institution = models.ForeignKey(Institution,on_delete=models.CASCADE,related_name="users",blank=True,null=True)
     role = models.CharField(max_length=50,choices=Roles.choices,default=Roles.TEACHER)
     objects = CustomUserManager()
